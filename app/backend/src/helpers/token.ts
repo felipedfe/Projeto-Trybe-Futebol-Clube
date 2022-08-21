@@ -1,19 +1,22 @@
-import { sign } from 'jsonwebtoken';
+import { sign, SignOptions } from 'jsonwebtoken';
 import 'dotenv/config';
-import userLogin from '../interfaces/Ilogin';
-// import User from '../interfaces/user.interface';
-// import UserLogin from '../interfaces/userLogin.interface';
-// import JwtConfig from '../interfaces/jwtConfig';
+import jwtDecode from 'jwt-decode';
+import jwtToken from '../interfaces/IjwtToken';
 
-// const jwtConfig: JwtConfig = {
-//   expiresIn: '7d',
-//   algorithm: 'HS256',
-// };
+const jwtConfig: SignOptions = {
+  expiresIn: '7d',
+  algorithm: 'HS256',
+};
 
-const secret = process.env.JWT_SECRET;
+const secret = process.env.JWT_SECRET || 'jwtsecret';
 
-function generateToken(data: userLogin):string {
-  return sign({ data }, secret as string);
+export function generateToken(data: string):string {
+  return sign({ data }, secret, jwtConfig);
 }
 
-export default generateToken;
+export function decodeToken(token: string) {
+  return jwtDecode<jwtToken>(token);
+}
+
+// Com a ajuda desse post!
+// https://stackoverflow.com/questions/61199530/typescript-error-with-accessing-jwt-decode-object

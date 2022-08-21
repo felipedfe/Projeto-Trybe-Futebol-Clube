@@ -1,22 +1,29 @@
 import { Request, Response } from 'express';
-import * as bcrypt from 'bcryptjs';
 import UserService from '../service/user.service';
-// import customError from '../helpers/customError';
-
-const salt = bcrypt.genSaltSync(10);
-const hash = bcrypt.hashSync('Admin', salt);
-
-console.log(bcrypt.compareSync('Admin', hash));
-console.log(bcrypt.compareSync('senha_errada', hash));
-console.log(hash);
+import customError from '../helpers/customError';
+import { decodeToken } from '../helpers/token';
 
 export default class UserController {
   // POST
   static async login(req: Request, res: Response) {
-    const user = req.body;
-    const token = await UserService.login(user);
-    // console.log(token);
+    // const { email, password } = req.body;
+
+    // if (!email || !password) throw customError('BadRequest', 'All fields must be filled');
+
+    const token = await UserService.login(req.body);
 
     return res.status(200).json({ token });
+  }
+
+  static async validate(req: Request, res: Response) {
+    const { authorization } = req.headers;
+
+    if (!authorization) throw customError('BadRequest', 'Token not found');
+
+    const decodedAuth = decodeToken(authorization);
+
+    const role = await UserService.validate(decodedAuth);
+
+    return res.status(200).json({ role });
   }
 }

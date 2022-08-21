@@ -2,7 +2,8 @@ import * as bcrypt from 'bcryptjs';
 import customError from '../helpers/customError';
 import UserModel from '../database/models/user';
 import UserLogin from '../interfaces/Ilogin';
-import generateToken from '../helpers/token';
+import { generateToken, decodeToken } from '../helpers/token';
+import jwtToken from '../interfaces/IjwtToken';
 
 export default class UserService {
   // POST
@@ -13,11 +14,12 @@ export default class UserService {
     if (password.length < 6) {
       throw customError('Unauthorized', 'Password must have at least 6 characters');
     }
+
     return null;
   }
 
   static async login(user: UserLogin) {
-    const { username: email, password } = user;
+    const { email, password } = user;
 
     this.verifyfields(email, password);
 
@@ -26,14 +28,40 @@ export default class UserService {
       raw: true,
     });
 
-    if (!findUser) throw customError('Unauthorized', 'Username invalid');
+    if (!findUser) throw customError('Unauthorized', 'Incorrect email or password');
 
-    if (!bcrypt.compareSync(password, findUser.password)) {
-      throw customError('Unauthorized', 'Password invalid');
-    }
-    // console.log(result);
-    const token = generateToken(user);
+    const passwordCheck = await bcrypt.compare(password, findUser.password);
+    if (passwordCheck === false) throw customError('Unauthorized', 'Incorrect email or password');
+
+    console.log(findUser);
+
+    const token = generateToken(email);
+    console.log('decode: ', decodeToken(token));
 
     return token;
   }
+
+  static async validate(token: jwtToken) {
+    console.log(token.data);
+    const { data: email } = token;
+    console.log('email: ', email);
+
+    const findUser = await UserModel.findOne({
+      where: { email },
+      raw: true,
+    });
+
+    console.log(findUser);
+    if (!findUser) throw customError('BadRequest', 'No user found');
+
+    return findUser.role;
+  }
+
+  // static async findOne(data: string) {
+  //   const findUser = await UserModel.findOne({
+  //     where: { data },
+  //     raw: true,
+  //   });
+  //   return findUser;
+  // }
 }

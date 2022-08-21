@@ -30,7 +30,7 @@ class App {
   }
 
   public start(PORT: string | number):void {
-    this.app.use(loginRoute);
+    this.app.use('/login', loginRoute);
 
     this.app.use(errorMiddleware);
     this.app.listen(PORT, () => console.log(`Running on port ${PORT}`));

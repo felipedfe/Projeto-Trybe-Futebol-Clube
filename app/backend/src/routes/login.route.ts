@@ -3,6 +3,7 @@ import UserController from '../controller/user.controller';
 
 const router = Router();
 
-router.post('/login', UserController.login);
+router.post('/', UserController.login);
+router.get('/validate', UserController.validate);
 
 export default router;
