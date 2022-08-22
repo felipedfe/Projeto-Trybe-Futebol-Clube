@@ -28,12 +28,11 @@ export default class UserService {
       raw: true,
     });
 
+    console.log('find user: ', findUser);
     if (!findUser) throw customError('Unauthorized', 'Incorrect email or password');
 
     const passwordCheck = await bcrypt.compare(password, findUser.password);
     if (passwordCheck === false) throw customError('Unauthorized', 'Incorrect email or password');
-
-    console.log(findUser);
 
     const token = generateToken(email);
     console.log('decode: ', decodeToken(token));
@@ -42,9 +41,7 @@ export default class UserService {
   }
 
   static async validate(token: jwtToken) {
-    console.log(token.data);
     const { data: email } = token;
-    console.log('email: ', email);
 
     const findUser = await UserModel.findOne({
       where: { email },
@@ -56,12 +53,4 @@ export default class UserService {
 
     return findUser.role;
   }
-
-  // static async findOne(data: string) {
-  //   const findUser = await UserModel.findOne({
-  //     where: { data },
-  //     raw: true,
-  //   });
-  //   return findUser;
-  // }
 }

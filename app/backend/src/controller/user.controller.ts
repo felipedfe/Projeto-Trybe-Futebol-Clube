@@ -7,7 +7,6 @@ export default class UserController {
   // POST
   static async login(req: Request, res: Response) {
     // const { email, password } = req.body;
-
     // if (!email || !password) throw customError('BadRequest', 'All fields must be filled');
 
     const token = await UserService.login(req.body);

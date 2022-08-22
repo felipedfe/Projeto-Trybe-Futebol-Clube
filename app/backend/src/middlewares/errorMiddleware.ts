@@ -11,12 +11,12 @@ export default (err: Error, req: Request, res: Response, _next: NextFunction) =>
     case 'Unauthorized':
       res.status(401).json({ message });
       break;
-    case 'NotFoundError':
-      res.status(404).json({ message });
-      break;
-    case 'ConflictError':
-      res.status(409).json({ message });
-      break;
+    // case 'NotFoundError':
+    //   res.status(404).json({ message });
+    //   break;
+    // case 'ConflictError':
+    //   res.status(409).json({ message });
+    //   break;
     default:
       console.error(err);
       res.sendStatus(500);
