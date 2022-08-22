@@ -9,4 +9,13 @@ export default class TeamsService {
 
     return allTeams;
   }
+
+  static async getById(id: string) {
+    const result = await TeamsModel.findOne({
+      where: { id },
+    });
+
+    // ? para caso ele seja null
+    return result?.get();
+  }
 }
