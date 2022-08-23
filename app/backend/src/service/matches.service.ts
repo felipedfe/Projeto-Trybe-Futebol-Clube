@@ -60,7 +60,7 @@ export default class MatchesService {
     });
 
     const matches = this.formatResult(result);
-
+    console.log(matches);
     return matches;
   }
 }
