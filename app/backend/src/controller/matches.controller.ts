@@ -23,7 +23,11 @@ export default class MatchesController {
     return res.status(200).json(matches);
   }
 
-  static async listInProgress(req: Request, res:Response) {
-    return res.status(200).json({ ok: 'OK!' });
+  static async addMatch(req: Request, res:Response) {
+    const match = req.body;
+
+    const result = await matchesService.addMatch(match);
+
+    return res.status(201).json(result);
   }
 }

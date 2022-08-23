@@ -63,4 +63,18 @@ export default class MatchesService {
     console.log(matches);
     return matches;
   }
+
+  static async addMatch(match: MatchesModel) {
+    console.log(match);
+    const { homeTeam, awayTeam, homeTeamGoals, awayTeamGoals } = match;
+    const result = await MatchesModel.create({
+      homeTeam,
+      awayTeam,
+      homeTeamGoals,
+      awayTeamGoals,
+      inProgress: true,
+    });
+    console.log(result.get());
+    return result.get();
+  }
 }
