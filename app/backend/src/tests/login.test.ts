@@ -1,6 +1,7 @@
 import * as sinon from 'sinon';
 import * as chai from 'chai';
 import * as bcrypt from 'bcryptjs';
+import { generateToken } from '../helpers/token';
 // @ts-ignore
 import chaiHttp = require('chai-http');
 import User from '../database/models/user';
@@ -15,12 +16,19 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const userMock = {
-    id: 1,
-    username: 'teste@email.com',
-    role: 'admin-teste',
-    email: 'teste@admin.com',
-    password: '1234567'
+  id: 1,
+  username: 'teste@email.com',
+  role: 'admin-teste',
+  email: 'teste@admin.com',
+  password: '1234567'
+}
 
+const invalidUserMock = {
+  id: 1,
+  username: 'invalid@email.com',
+  role: 'admin-invalid',
+  email: 'invalid@admin.com',
+  password: '1234567'
 }
 
 const userLoginBodyMock = {
@@ -71,12 +79,12 @@ describe('User', () => {
     it('É retornado um erro se for digitado um e-mail inválido', async () => {
       userLoginBodyMock.email = 'invalid@email.com'
       userLoginBodyMock.password = '1234567'
-      console.log(userLoginBodyMock)
+
       const comparison = userMock.email === userLoginBodyMock.email
-  
+
       const response = await chai.request(app).post('/login').send(userLoginBodyMock)
-      console.log(response.text);
-  
+
+
       expect(response.status).to.equal(401)
       expect(response.body.message).to.equal("Incorrect email or password")
     });
@@ -84,12 +92,11 @@ describe('User', () => {
     it('É retornado um erro se for digitada uma senha inválido', async () => {
       userLoginBodyMock.email = 'teste@email.com'
       userLoginBodyMock.password = '12345678'
-      console.log(userLoginBodyMock)
+
       const comparison = userMock.email === userLoginBodyMock.email
-  
+
       const response = await chai.request(app).post('/login').send(userLoginBodyMock)
-      console.log(response.text);
-  
+
       expect(response.status).to.equal(401)
       expect(response.body.message).to.equal("Incorrect email or password")
     });
@@ -97,14 +104,46 @@ describe('User', () => {
     it('É retornado um erro se a senha digitada possuir menos de 6 caracteres', async () => {
       userLoginBodyMock.email = 'teste@email.com'
       userLoginBodyMock.password = '123'
-      console.log(userLoginBodyMock)
+
       const comparison = userMock.email === userLoginBodyMock.email
-  
+
       const response = await chai.request(app).post('/login').send(userLoginBodyMock)
-      console.log(response.text);
-  
+
       expect(response.status).to.equal(401)
       expect(response.body.message).to.equal("Password must have at least 6 characters")
     });
+  })
+
+  describe('validate', async () => {
+    it('Será retornado o tipo de usuário caso o token seja válido', async () => {
+      sinon.stub(User, 'findOne').resolves(userMock as User)
+      const token = generateToken(userMock.email)
+      const userRole = userMock.role;
+
+      const response = await chai.request(app).get('/login/validate')
+        .set('Authorization', token)
+
+      expect(response.status).to.equal(200)
+      expect(response.body.role).to.equal(userRole)
+      sinon.restore();
+    })
+
+    it('Será retornado um erro caso não exista um token na requisição', async () => {
+      const response = await chai.request(app).get('/login/validate')
+
+      expect(response.status).to.equal(400)
+      expect(response.body.message).to.equal('Token not found')
+    })
+
+    it('Será retornado um erro caso o token seja inválido', async () => {
+      sinon.stub(User, 'findOne').resolves(null)
+      const invalidToken = generateToken(invalidUserMock.email)
+
+      const response = await chai.request(app).get('/login/validate')
+        .set('Authorization', invalidToken)
+
+      expect(response.status).to.equal(400)
+      expect(response.body.message).to.equal('No user found')
+    })
   })
 });

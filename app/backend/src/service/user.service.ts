@@ -7,7 +7,6 @@ import jwtToken from '../interfaces/IjwtToken';
 
 export default class UserService {
   // POST
-
   static verifyfields(email: string, password: string) {
     if (!email || !password) throw customError('BadRequest', 'All fields must be filled');
 
@@ -40,6 +39,7 @@ export default class UserService {
     return token;
   }
 
+  // GET
   static async validate(token: jwtToken) {
     const { data: email } = token;
 

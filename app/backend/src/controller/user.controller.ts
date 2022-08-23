@@ -14,6 +14,7 @@ export default class UserController {
     return res.status(200).json({ token });
   }
 
+  // GET
   static async validate(req: Request, res: Response) {
     const { authorization } = req.headers;
 
