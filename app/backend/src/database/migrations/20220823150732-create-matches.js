@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('users', {
+    await queryInterface.createTable('matches', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -11,6 +11,11 @@ module.exports = {
       home_team: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'teams',
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
       },
       home_team_goals: {
         type: Sequelize.INTEGER,
@@ -19,6 +24,11 @@ module.exports = {
       away_team: {
         type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: 'teams',
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
       },
       away_team_goals: {
         type: Sequelize.INTEGER,
@@ -32,11 +42,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
+    await queryInterface.dropTable('matches');
   }
 };
