@@ -2,18 +2,18 @@
 import MatchesModel from '../database/models/match';
 import Team from '../database/models/team';
 
-// interface typeTrueOrFalse {
-//   0: boolean,
-//   1: boolean,
-// }
-
-// const trueOrFalse: typeTrueOrFalse = {
-//   0: false,
-//   1: true,
-// };
-
 export default class MatchesService {
-  static async list() {
+  static async formatResult(data:MatchesModel[]) {
+    return data.map((team) => {
+      const obj = team.get();
+      obj.inProgress = !!obj.inProgress;
+      obj.teamHome = obj.teamHome.get();
+      obj.teamAway = obj.teamAway.get();
+      return obj;
+    });
+  }
+
+  static async listAll() {
     const result = await MatchesModel.findAll({
       include: [
         { model: Team, as: 'teamHome', attributes: ['teamName'] },
@@ -21,16 +21,46 @@ export default class MatchesService {
       ],
     });
 
-    const allMatches = result.map((team) => {
-      const obj = team.get();
-      obj.inProgress = !!obj.inProgress;
-      obj.teamHome = obj.teamHome.get();
-      obj.teamAway = obj.teamAway.get();
-      return obj;
+    // const allMatches = result.map((team) => {
+    //   const obj = team.get();
+    //   obj.inProgress = !!obj.inProgress;
+    //   obj.teamHome = obj.teamHome.get();
+    //   obj.teamAway = obj.teamAway.get();
+    //   return obj;
+    // });
+    const matches = this.formatResult(result);
+    return matches;
+  }
+
+  static async listInProgress() {
+    const result = await MatchesModel.findAll({
+      where: {
+        inProgress: 1,
+      },
+      include: [
+        { model: Team, as: 'teamHome', attributes: ['teamName'] },
+        { model: Team, as: 'teamAway', attributes: ['teamName'] },
+      ],
     });
 
-    // console.log(allMatches);
+    const matches = this.formatResult(result);
 
-    return allMatches;
+    return matches;
+  }
+
+  static async listFinished() {
+    const result = await MatchesModel.findAll({
+      where: {
+        inProgress: 0,
+      },
+      include: [
+        { model: Team, as: 'teamHome', attributes: ['teamName'] },
+        { model: Team, as: 'teamAway', attributes: ['teamName'] },
+      ],
+    });
+
+    const matches = this.formatResult(result);
+
+    return matches;
   }
 }
