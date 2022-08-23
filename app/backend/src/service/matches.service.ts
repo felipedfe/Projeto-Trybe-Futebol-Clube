@@ -3,7 +3,7 @@ import MatchesModel from '../database/models/match';
 import Team from '../database/models/team';
 
 export default class MatchesService {
-  static async formatResult(data:MatchesModel[]) {
+  static async formatResult(data: MatchesModel[]) {
     return data.map((team) => {
       const obj = team.get();
       obj.inProgress = !!obj.inProgress;
@@ -21,13 +21,6 @@ export default class MatchesService {
       ],
     });
 
-    // const allMatches = result.map((team) => {
-    //   const obj = team.get();
-    //   obj.inProgress = !!obj.inProgress;
-    //   obj.teamHome = obj.teamHome.get();
-    //   obj.teamAway = obj.teamAway.get();
-    //   return obj;
-    // });
     const matches = this.formatResult(result);
     return matches;
   }
@@ -64,8 +57,8 @@ export default class MatchesService {
     return matches;
   }
 
+  // POST
   static async addMatch(match: MatchesModel) {
-    console.log(match);
     const { homeTeam, awayTeam, homeTeamGoals, awayTeamGoals } = match;
     const result = await MatchesModel.create({
       homeTeam,
@@ -74,7 +67,15 @@ export default class MatchesService {
       awayTeamGoals,
       inProgress: true,
     });
-    console.log(result.get());
+
     return result.get();
+  }
+
+  // PATCH
+  static async finishMatch(id: string) {
+    await MatchesModel.update({ inProgress: false }, {
+      where: { id },
+    });
+    return { message: 'Finished' };
   }
 }
