@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import matchesService from '../service/matches.service';
+import customError from '../helpers/customError';
 
 export default class MatchesController {
   // GET
@@ -26,6 +27,13 @@ export default class MatchesController {
   // POST
   static async addMatch(req: Request, res:Response) {
     const match = req.body;
+
+    if (match.homeTeam === match.awayTeam) {
+      throw customError(
+        'Unauthorized',
+        'It is not possible to create a match with two equal teams',
+      );
+    }
 
     const result = await matchesService.addMatch(match);
 

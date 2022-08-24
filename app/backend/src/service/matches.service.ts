@@ -1,4 +1,5 @@
-// import customError from '../helpers/customError';
+// import { Op } from 'sequelize';
+import customError from '../helpers/customError';
 import MatchesModel from '../database/models/match';
 import Team from '../database/models/team';
 
@@ -11,6 +12,16 @@ export default class MatchesService {
       obj.teamAway = obj.teamAway.get();
       return obj;
     });
+  }
+
+  static async verifyMatchesIds(match: MatchesModel) {
+    const result = await Team.findAll({
+      where: {
+        id: [match.homeTeam, match.awayTeam],
+      },
+    });
+
+    if (result.length < 2) throw customError('NotFoundError', 'There is no team with such id!');
   }
 
   static async listAll() {
@@ -59,6 +70,8 @@ export default class MatchesService {
 
   // POST
   static async addMatch(match: MatchesModel) {
+    await this.verifyMatchesIds(match);
+
     const { homeTeam, awayTeam, homeTeamGoals, awayTeamGoals } = match;
     const result = await MatchesModel.create({
       homeTeam,
@@ -69,6 +82,7 @@ export default class MatchesService {
     });
 
     return result.get();
+    // return null;
   }
 
   // PATCH
