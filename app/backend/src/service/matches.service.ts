@@ -107,4 +107,15 @@ export default class MatchesService {
     });
     return { message: 'Finished' };
   }
+
+  static async updateMatch(id: string, match: MatchesModel) {
+    await MatchesModel.update({
+      homeTeamGoals: match.homeTeamGoals,
+      awayTeamGoals: match.awayTeamGoals,
+    }, {
+      where: { id },
+    });
+
+    return { message: 'GOOOOL!' };
+  }
 }
