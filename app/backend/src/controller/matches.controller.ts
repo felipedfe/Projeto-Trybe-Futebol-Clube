@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import matchesService from '../service/matches.service';
 import customError from '../helpers/customError';
+import { decodeToken } from '../helpers/token';
 
 export default class MatchesController {
   // GET
@@ -27,6 +28,18 @@ export default class MatchesController {
   // POST
   static async addMatch(req: Request, res:Response) {
     const match = req.body;
+    const { authorization } = req.headers;
+
+    if (!authorization) throw customError('BadRequest', 'Token not found');
+
+    try {
+      const decodedAuth = decodeToken(authorization);
+      await matchesService.validateToken(decodedAuth);
+    } catch (error: any) {
+      error.message = 'Token must be a valid token';
+
+      return res.status(401).json({ message: error.message });
+    }
 
     if (match.homeTeam === match.awayTeam) {
       throw customError(

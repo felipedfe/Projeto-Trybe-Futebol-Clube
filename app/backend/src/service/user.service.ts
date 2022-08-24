@@ -40,8 +40,9 @@ export default class UserService {
   }
 
   // GET
-  static async validate(token: jwtToken) {
-    const { data: email } = token;
+  static async validate(decodedToken: jwtToken) {
+    const { data: email } = decodedToken;
+    console.log(decodedToken);
 
     const findUser = await UserModel.findOne({
       where: { email },

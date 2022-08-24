@@ -2,6 +2,8 @@
 import customError from '../helpers/customError';
 import MatchesModel from '../database/models/match';
 import Team from '../database/models/team';
+import jwtToken from '../interfaces/IjwtToken';
+import UserModel from '../database/models/user';
 
 export default class MatchesService {
   static async formatResult(data: MatchesModel[]) {
@@ -12,6 +14,19 @@ export default class MatchesService {
       obj.teamAway = obj.teamAway.get();
       return obj;
     });
+  }
+
+  static async validateToken(decodedToken: jwtToken) {
+    const { data: email } = decodedToken;
+    console.log(decodedToken);
+
+    const findUser = await UserModel.findOne({
+      where: { email },
+      raw: true,
+    });
+
+    console.log(findUser);
+    if (!findUser) throw customError('Unauthorized', 'Token must be a valid token');
   }
 
   static async verifyMatchesIds(match: MatchesModel) {
