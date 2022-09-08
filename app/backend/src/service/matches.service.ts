@@ -1,4 +1,3 @@
-// import { Op } from 'sequelize';
 import customError from '../helpers/customError';
 import MatchesModel from '../database/models/match';
 import Team from '../database/models/team';

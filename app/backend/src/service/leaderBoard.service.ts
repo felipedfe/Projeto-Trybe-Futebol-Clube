@@ -31,12 +31,6 @@ export default class LeaderBoardService {
 
     if (!result) throw customError('NotFoundError', 'There is no team');
 
-    // const leaderBoard = result.map((team) => team.name);
-    // console.log(leaderBoard);
-    console.log(result.length);
-
-    // result.map((time: boardTeam) => time.name);
-
     return result;
   }
 }

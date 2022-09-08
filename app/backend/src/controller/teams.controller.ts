@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import TeamsService from '../service/teams.service';
-// import customError from '../helpers/customError';
-// import { decodeToken } from '../helpers/token';
 
 export default class TeamsController {
   // GET

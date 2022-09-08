@@ -1,4 +1,3 @@
-// import customError from '../helpers/customError';
 import TeamsModel from '../database/models/team';
 
 export default class TeamsService {
